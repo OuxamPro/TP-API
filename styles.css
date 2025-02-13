@@ -1,0 +1,66 @@
+body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Style pour la page */
+    h2 {
+        margin-top: 20px;
+        color: #333;
+    }
+
+    /* Champ de recherche */
+    #search {
+        margin: 20px auto;
+        padding: 12px 20px;
+        width: 80%;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+
+    #search:focus {
+        outline: none;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+    }
+
+    /* Conteneur des suggestions */
+    #suggestions {
+        max-height: 150px;
+        overflow-y: auto;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        width: 50%;
+        margin-left: 25%;
+        position: absolute;
+        background-color: #fff;
+        z-index: 999;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+    }
+
+    /* Suggestions : Réduire la taille des éléments */
+    .suggestion-item {
+        padding: 8px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+
+
+    /* Carte */
+    #map {
+        height: 500px;
+        width: 80%;
+        margin: 175px auto 20px auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        }
