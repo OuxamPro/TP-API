@@ -3,6 +3,7 @@ body {
         text-align: center;
         margin: 0;
         padding: 0;
+        overflow: hidden;
     }
 
     /* Style pour la page */
@@ -60,7 +61,7 @@ body {
     #map {
         height: 500px;
         width: 80%;
-        margin: 175px auto 20px auto;
+        margin: 165px auto 20px auto;
         border: 1px solid #ddd;
         border-radius: 8px;
         }

@@ -97,22 +97,26 @@ require_once 'stations.php';
         displaySuggestions(suggestions);
 
         // Mettre à jour la carte avec les marqueurs filtrés
+        updateMapWithFilteredMarkers(filteredMarkers);
+    }
+
+    // Fonction pour mettre à jour la carte avec les marqueurs filtrés
+    function updateMapWithFilteredMarkers(filteredMarkers) {
         markers.forEach(function(marker) {
-            map.removeLayer(marker); // Supprimer tous les marqueurs de la carte
+            marker.setOpacity(0); // Rendre tous les marqueurs invisibles sans les supprimer
         });
 
         filteredMarkers.forEach(function(marker) {
-            marker.addTo(map); // Ajouter seulement les marqueurs filtrés
+            marker.setOpacity(1); // Rendre les marqueurs filtrés visibles
         });
     }
-
 
     // Fonction pour afficher les suggestions
     function displaySuggestions(suggestions) {
         var suggestionsContainer = document.getElementById('suggestions');
         suggestionsContainer.innerHTML = ""; // Vider les suggestions précédentes
 
-        suggestions.forEach(function(station) {
+        suggestions.slice(0, 10).forEach(function(station) { // Limiter à 10 suggestions
             var div = document.createElement("div");
             div.classList.add("suggestion-item");
             div.textContent = station.name;

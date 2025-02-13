@@ -39,4 +39,3 @@ foreach ($info_data['data']['stations'] as $station) {
 ];
 
 }
-?>
