@@ -28,14 +28,15 @@ foreach ($info_data['data']['stations'] as $station) {
     $status = $status_map[$station_id] ?? null;
     
     $stations[] = [
-        'name' => $station['name'],
-        'capacity' => $station['capacity'],
-        'lat' => $station['lat'],
-        'lon' => $station['lon'],
-        'numBikesAvailable' => $status['num_bikes_available'] ?? 0,
-        'numEbikeAvailable' => $status['num_bikes_available_types'][0]['ebike'] ?? 0,
-        'numMechAvailable' => $status['num_bikes_available_types'][0]['mechanical'] ?? 0,
-        'numDocksAvailable' => $status['num_docks_available'] ?? 0
-    ];
+    'name' => $station['name'],
+    'capacity' => $station['capacity'],
+    'lat' => $station['lat'],
+    'lon' => $station['lon'],
+    'numBikesAvailable' => $status['num_bikes_available'] ?? 0,
+    'numEbikeAvailable' => $status['num_bikes_available_types'][0]['ebike'] ?? 0,
+    'numMechAvailable' => $status['num_bikes_available_types'][0]['mechanical'] ?? 0,
+    'numDocksAvailable' => $status['num_docks_available'] ?? 0
+];
+
 }
 ?>

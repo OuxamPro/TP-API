@@ -18,6 +18,15 @@ require_once 'stations.php';
 <body>
     <h2>Carte des Stations Vélib'</h2>
 
+    <!-- Menu déroulant pour filtrer par type de vélo -->
+    <label for="bike-type-filter">Filtrer par type de vélo :</label>
+    <select id="bike-type-filter" onchange="filterStations()">
+        <option value="">Tous les types de vélos</option>
+        <option value="mechanical">Vélos mécaniques</option>
+        <option value="ebike">Vélos électriques</option>
+    </select>
+
+
     <!-- Champ de recherche -->
     <input type="text" id="search" placeholder="Rechercher une station..." oninput="filterStations()" />
 
@@ -55,16 +64,30 @@ require_once 'stations.php';
         markers.push(marker); // Ajouter chaque marqueur au tableau markers
     });
 
-    // Fonction pour filtrer les stations en fonction de la recherche
+    // Fonction pour filtrer les stations en fonction de la recherche et du type de vélo
     function filterStations() {
         var query = document.getElementById('search').value.toLowerCase();
+        var selectedBikeType = document.getElementById('bike-type-filter').value;
         var suggestions = [];
         var filteredMarkers = [];
 
-        // Filtrer les stations
+        // Filtrer les stations en fonction du nom et du type de vélo
         stations.forEach(function(station, index) {
             var stationName = station.name.toLowerCase();
-            if (stationName.includes(query)) {
+            var isMatchingType = false;
+
+            // Vérifier si le type de vélo correspond
+            if (selectedBikeType === "mechanical" && station.numMechAvailable > 0) {
+                isMatchingType = true;
+            } else if (selectedBikeType === "ebike" && station.numEbikeAvailable > 0) {
+                isMatchingType = true;
+            } else if (selectedBikeType === "" && (station.numMechAvailable > 0 || station.numEbikeAvailable >
+                    0)) {
+                isMatchingType = true;
+            }
+
+            // Vérifier si la station correspond au filtre de recherche et au type de vélo
+            if (stationName.includes(query) && isMatchingType) {
                 suggestions.push(station); // Ajouter les suggestions correspondantes
                 filteredMarkers.push(markers[index]); // Garder les marqueurs correspondants
             }
@@ -82,6 +105,7 @@ require_once 'stations.php';
             marker.addTo(map); // Ajouter seulement les marqueurs filtrés
         });
     }
+
 
     // Fonction pour afficher les suggestions
     function displaySuggestions(suggestions) {
