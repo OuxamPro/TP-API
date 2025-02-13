@@ -9,14 +9,14 @@ require_once 'stations.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stations Vélib' Métropole</title>
+    <title>Stations Vélib' Paris</title>
     <link rel="stylesheet" href="styles.css" />
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
 <body>
-    <h2>Carte des Stations Vélib'</h2>
+    <h2>Carte des Stations Vélib' Paris</h2>
 
     <!-- Menu déroulant pour filtrer par type de vélo -->
     <label for="bike-type-filter">Filtrer par type de vélo :</label>

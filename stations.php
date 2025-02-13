@@ -33,7 +33,7 @@ foreach ($info_data['data']['stations'] as $station) {
     'lat' => $station['lat'],
     'lon' => $station['lon'],
     'numBikesAvailable' => $status['num_bikes_available'] ?? 0,
-    'numEbikeAvailable' => $status['num_bikes_available_types'][0]['ebike'] ?? 0,
+    'numEbikeAvailable' => $status['num_bikes_available_types'][1]['ebike'] ?? 0,
     'numMechAvailable' => $status['num_bikes_available_types'][0]['mechanical'] ?? 0,
     'numDocksAvailable' => $status['num_docks_available'] ?? 0
 ];
