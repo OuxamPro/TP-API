@@ -26,12 +26,21 @@ require_once 'stations.php';
         <option value="ebike">Vélos électriques</option>
     </select>
 
-
     <!-- Champ de recherche -->
     <input type="text" id="search" placeholder="Rechercher une station..." oninput="filterStations()" />
 
     <!-- Conteneur des suggestions -->
     <div id="suggestions"></div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <label for="minMech">🔧 Min vélos mécaniques :</label>
+        <input type="number" id="minMech" min="0" value="0" style="width: 50px; margin-right: 20px;">
+
+        <label for="minEbike">⚡ Min vélos électriques :</label>
+        <input type="number" id="minEbike" min="0" value="0" style="width: 50px;">
+
+        <button onclick="filterStations()" style="margin-left: 20px; padding: 5px 10px;">Filtrer</button>
+    </div>
 
     <div id="map"></div>
 
@@ -39,7 +48,7 @@ require_once 'stations.php';
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
     // Initialisation de la carte centrée sur Paris
-    var map = L.map('map').setView([48.8566, 2.3522], 12);
+    var map = L.map('map').setView([48.8566, 2.3522], 15);
 
     // Ajouter OpenStreetMap comme fond de carte
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -50,100 +59,91 @@ require_once 'stations.php';
     var stations = <?php echo json_encode($stations); ?>;
     var markers = [];
 
-    // Ajouter les marqueurs sur la carte
-    stations.forEach(function(station) {
-        var marker = L.marker([station.lat, station.lon]).addTo(map);
-        marker.bindPopup(
-            "<b>" + station.name + "</b><br>" +
-            "Capacité : " + station.capacity + "<br>" +
-            "🚲 Vélos disponibles : " + station.numBikesAvailable + "<br>" +
-            "🔋 Vélos électriques : " + station.numEbikeAvailable + "<br>" +
-            "⚙️ Vélos mécaniques : " + station.numMechAvailable + "<br>" +
-            "📍 Bornettes libres : " + station.numDocksAvailable
-        );
-        markers.push(marker); // Ajouter chaque marqueur au tableau markers
-    });
+    // Fonction pour afficher les stations sur la carte
+    function displayStations(filteredStations) {
+        // Supprimer les anciens marqueurs
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
 
-    // Fonction pour filtrer les stations en fonction de la recherche et du type de vélo
+        // Ajouter les nouveaux marqueurs filtrés
+        filteredStations.forEach(function(station) {
+            var marker = L.marker([station.lat, station.lon]).addTo(map);
+            marker.bindPopup(
+                "<b>" + station.name + "</b><br>" +
+                "🚲 Vélos disponibles : " + station.numBikesAvailable + "<br>" +
+                "🔋 Vélos électriques : " + station.numEbikeAvailable + "<br>" +
+                "⚙️ Vélos mécaniques : " + station.numMechAvailable + "<br>" +
+                "📍 Bornettes libres : " + station.numDocksAvailable
+            );
+            markers.push(marker);
+        });
+    }
+
+    // Fonction pour filtrer les stations
     function filterStations() {
-        var query = document.getElementById('search').value.toLowerCase();
-        var selectedBikeType = document.getElementById('bike-type-filter').value;
+        var minMech = parseInt(document.getElementById("minMech").value) || 0;
+        var minEbike = parseInt(document.getElementById("minEbike").value) || 0;
+        var query = document.getElementById("search").value.toLowerCase();
+        var selectedBikeType = document.getElementById("bike-type-filter").value;
         var suggestions = [];
-        var filteredMarkers = [];
 
-        // Filtrer les stations en fonction du nom et du type de vélo
-        stations.forEach(function(station, index) {
-            var stationName = station.name.toLowerCase();
-            var isMatchingType = false;
+        var filteredStations = stations.filter(station => {
+            var matchMech = station.numMechAvailable >= minMech;
+            var matchEbike = station.numEbikeAvailable >= minEbike;
+            var matchQuery = station.name.toLowerCase().includes(query);
+            var matchType = true;
 
-            // Vérifier si le type de vélo correspond
-            if (selectedBikeType === "mechanical" && station.numMechAvailable > 0) {
-                isMatchingType = true;
-            } else if (selectedBikeType === "ebike" && station.numEbikeAvailable > 0) {
-                isMatchingType = true;
-            } else if (selectedBikeType === "" && (station.numMechAvailable > 0 || station.numEbikeAvailable >
-                    0)) {
-                isMatchingType = true;
+            if (selectedBikeType === "mechanical") {
+                matchType = station.numMechAvailable > 0;
+            } else if (selectedBikeType === "ebike") {
+                matchType = station.numEbikeAvailable > 0;
             }
 
-            // Vérifier si la station correspond au filtre de recherche et au type de vélo
-            if (stationName.includes(query) && isMatchingType) {
-                suggestions.push(station); // Ajouter les suggestions correspondantes
-                filteredMarkers.push(markers[index]); // Garder les marqueurs correspondants
+            if (matchQuery) {
+                suggestions.push(station);
             }
+
+            return matchMech && matchEbike && matchQuery && matchType;
         });
 
-        // Afficher les suggestions sous le champ de recherche
+        displayStations(filteredStations);
         displaySuggestions(suggestions);
-
-        // Mettre à jour la carte avec les marqueurs filtrés
-        updateMapWithFilteredMarkers(filteredMarkers);
     }
 
-    // Fonction pour mettre à jour la carte avec les marqueurs filtrés
-    function updateMapWithFilteredMarkers(filteredMarkers) {
-        markers.forEach(function(marker) {
-            marker.setOpacity(0); // Rendre tous les marqueurs invisibles sans les supprimer
-        });
-
-        filteredMarkers.forEach(function(marker) {
-            marker.setOpacity(1); // Rendre les marqueurs filtrés visibles
-        });
-    }
-
-    // Fonction pour afficher les suggestions
+    // Fonction pour afficher la liste des suggestions
     function displaySuggestions(suggestions) {
-        var suggestionsContainer = document.getElementById('suggestions');
-        suggestionsContainer.innerHTML = ""; // Vider les suggestions précédentes
+        var suggestionsContainer = document.getElementById("suggestions");
+        suggestionsContainer.innerHTML = "";
 
-        suggestions.slice(0, 10).forEach(function(station) { // Limiter à 10 suggestions
+        suggestions.slice(0, 10).forEach(function(station) { // Limite à 10 suggestions
             var div = document.createElement("div");
             div.classList.add("suggestion-item");
             div.textContent = station.name;
             div.onclick = function() {
-                // Zoom sur la station lorsque l'utilisateur clique sur une suggestion
                 var marker = markers[stations.indexOf(station)];
                 map.setView([station.lat, station.lon], 14); // Zoom sur la station
-                marker.openPopup(); // Ouvrir le popup du marqueur
-                document.getElementById('search').value = station
-                    .name; // Mettre le nom dans le champ de recherche
-                suggestionsContainer.innerHTML = ""; // Vider les suggestions après la sélection
+                marker.openPopup(); // Ouvrir le popup
+                document.getElementById("search").value = station.name;
+                suggestionsContainer.innerHTML = "";
             };
             suggestionsContainer.appendChild(div);
         });
     }
 
     // Ajouter un gestionnaire d'événement pour fermer les suggestions lorsqu'on clique en dehors du champ de recherche
-    document.addEventListener('click', function(event) {
-        var suggestionsContainer = document.getElementById('suggestions');
-        var searchInput = document.getElementById('search');
+    document.addEventListener("click", function(event) {
+        var suggestionsContainer = document.getElementById("suggestions");
+        var searchInput = document.getElementById("search");
 
-        // Si le clic se fait en dehors du champ de recherche et de la liste des suggestions, fermer les suggestions
         if (!searchInput.contains(event.target) && !suggestionsContainer.contains(event.target)) {
-            suggestionsContainer.innerHTML = ''; // Vider les suggestions
+            suggestionsContainer.innerHTML = "";
         }
     });
+
+    // Afficher toutes les stations au chargement
+    displayStations(stations);
     </script>
+
 </body>
 
 </html>

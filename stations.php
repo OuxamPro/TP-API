@@ -29,7 +29,6 @@ foreach ($info_data['data']['stations'] as $station) {
     
     $stations[] = [
     'name' => $station['name'],
-    'capacity' => $station['capacity'],
     'lat' => $station['lat'],
     'lon' => $station['lon'],
     'numBikesAvailable' => $status['num_bikes_available'] ?? 0,
