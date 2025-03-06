@@ -11,8 +11,13 @@ require_once 'stations.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stations Vélib' Paris</title>
     <link rel="stylesheet" href="styles.css" />
+
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Leaflet.markercluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
 </head>
 
 <body>
@@ -46,6 +51,10 @@ require_once 'stations.php';
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Leaflet.markercluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
     <script>
     // Initialisation de la carte centrée sur Paris
     var map = L.map('map').setView([48.8566, 2.3522], 15);
@@ -57,17 +66,16 @@ require_once 'stations.php';
 
     // Charger les données des stations depuis PHP
     var stations = <?php echo json_encode($stations); ?>;
-    var markers = [];
 
-    // Fonction pour afficher les stations sur la carte
+    // Initialiser le groupe de clusters
+    var markersCluster = L.markerClusterGroup();
+
+    // Fonction pour afficher les stations sur la carte avec clustering
     function displayStations(filteredStations) {
-        // Supprimer les anciens marqueurs
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
+        markersCluster.clearLayers(); // Supprimer les anciens marqueurs
 
-        // Ajouter les nouveaux marqueurs filtrés
         filteredStations.forEach(function(station) {
-            var marker = L.marker([station.lat, station.lon]).addTo(map);
+            var marker = L.marker([station.lat, station.lon]);
             marker.bindPopup(
                 "<b>" + station.name + "</b><br>" +
                 "🚲 Vélos disponibles : " + station.numBikesAvailable + "<br>" +
@@ -75,8 +83,10 @@ require_once 'stations.php';
                 "⚙️ Vélos mécaniques : " + station.numMechAvailable + "<br>" +
                 "📍 Bornettes libres : " + station.numDocksAvailable
             );
-            markers.push(marker);
+            markersCluster.addLayer(marker); // Ajouter le marqueur au cluster
         });
+
+        map.addLayer(markersCluster); // Ajouter le groupe de clusters à la carte
     }
 
     // Fonction pour filtrer les stations
@@ -120,10 +130,7 @@ require_once 'stations.php';
             div.classList.add("suggestion-item");
             div.textContent = station.name;
             div.onclick = function() {
-                var marker = markers[stations.indexOf(station)];
                 map.setView([station.lat, station.lon], 14); // Zoom sur la station
-                marker.openPopup(); // Ouvrir le popup
-                document.getElementById("search").value = station.name;
                 suggestionsContainer.innerHTML = "";
             };
             suggestionsContainer.appendChild(div);
