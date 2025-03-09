@@ -19,8 +19,8 @@ Ce projet est une application web permettant d'afficher les stations Vélib' à 
 
 ## Installation
 1. **Cloner le dépôt**
-   git clone <https://github.com/OuxamPro/TP-API.git>
-   cd <TP-API>
+   git clone https://github.com/OuxamPro/TP-API.git
+   cd TP-API
 
 2. **Lancer un serveur local PHP**
    php -S localhost:8000
